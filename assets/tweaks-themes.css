@@ -1,0 +1,60 @@
+/* ============================================================
+   Tweak themes — headline typeface moods + softness/shape.
+   (Color moods are applied as inline CSS vars on <html> by JS.)
+   ============================================================ */
+
+/* ---------- HEADLINE TYPEFACE ---------- */
+/* default = "elegant" : Noto Serif KR 500 (no rule needed) */
+
+/* modern : contemporary gothic / sans headlines */
+:root[data-headline="modern"] { --serif: "Noto Sans KR", -apple-system, sans-serif; }
+:root[data-headline="modern"] h1,
+:root[data-headline="modern"] h2,
+:root[data-headline="modern"] h3,
+:root[data-headline="modern"] h4,
+:root[data-headline="modern"] .brand b,
+:root[data-headline="modern"] .price-card .price,
+:root[data-headline="modern"] .hero h1 { font-weight: 700; letter-spacing: -.035em; }
+:root[data-headline="modern"] .persona p { font-weight: 500; }
+
+/* airy : delicate thin serif, looser tracking — editorial magazine feel */
+:root[data-headline="airy"] { --serif: "Noto Serif KR", serif; }
+:root[data-headline="airy"] h1,
+:root[data-headline="airy"] h2,
+:root[data-headline="airy"] h3,
+:root[data-headline="airy"] h4,
+:root[data-headline="airy"] h2.display,
+:root[data-headline="airy"] .hero h1,
+:root[data-headline="airy"] .price-card .price { font-weight: 300; letter-spacing: 0; }
+
+/* ---------- SOFTNESS / SHAPE ---------- */
+/* default = "editorial" : crisp corners, defined shadows (no rule needed) */
+
+:root[data-shape="soft"] {
+  --radius: 12px;
+  --shadow:    0 20px 54px -20px rgba(36,58,45,.22), 0 4px 14px rgba(36,58,45,.06);
+  --shadow-sm: 0 6px 20px -8px rgba(43,42,38,.12);
+  --shadow-lg: 0 36px 80px -26px rgba(36,58,45,.30);
+}
+:root[data-shape="soft"] .card,
+:root[data-shape="soft"] .infra,
+:root[data-shape="soft"] .class-card,
+:root[data-shape="soft"] .feature-grid,
+:root[data-shape="soft"] .tour,
+:root[data-shape="soft"] .b2b-card,
+:root[data-shape="soft"] .flow-step,
+:root[data-shape="soft"] .price-card,
+:root[data-shape="soft"] .opt,
+:root[data-shape="soft"] .contact-person,
+:root[data-shape="soft"] .inc-item,
+:root[data-shape="soft"] .cal-wrap,
+:root[data-shape="soft"] .kakao-block,
+:root[data-shape="soft"] .b2b-form,
+:root[data-shape="soft"] .ph { border-radius: 24px; }
+:root[data-shape="soft"] .class-card .ph { border-radius: 0; }
+:root[data-shape="soft"] .day { border-radius: 16px; }
+:root[data-shape="soft"] .inc-tabs,
+:root[data-shape="soft"] .freq,
+:root[data-shape="soft"] .pill,
+:root[data-shape="soft"] .badge { border-radius: 40px; }
+:root[data-shape="soft"] .nav.scrolled { border-radius: 0; }
