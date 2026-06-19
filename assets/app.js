@@ -10,7 +10,7 @@
    2) 아래 따옴표 안에 그 URL을 붙여넣으세요.
       (비워두면 전송 없이 기존처럼 '접수' 메시지만 표시됩니다.)
    ============================================================ */
-window.GSHEET_ENDPOINT = '';
+window.GSHEET_ENDPOINT = 'https://script.google.com/macros/s/AKfycbzqzN5j-ORiQ0XMnE4qVXk85pA_WOSvRHsgPt3nJM9mbFw_iPeFGLMtkbi6Kn0xxMWerA/exec';
 
 /* 폼 데이터를 구글 시트(Apps Script 웹앱)로 전송 */
 function sendToSheet(payload) {
