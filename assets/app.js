@@ -1,6 +1,79 @@
 /* ============================================================
    인생버킷 · 세부 한달살기 — interactions
    ============================================================ */
+
+/* ============================================================
+   Google Sheets 연동 설정
+   ------------------------------------------------------------
+   1) Google Apps Script(google-apps-script.gs)를 배포하면
+      "...script.google.com/macros/s/.../exec" 형태의 URL이 나옵니다.
+   2) 아래 따옴표 안에 그 URL을 붙여넣으세요.
+      (비워두면 전송 없이 기존처럼 '접수' 메시지만 표시됩니다.)
+   ============================================================ */
+window.GSHEET_ENDPOINT = '';
+
+/* 폼 데이터를 구글 시트(Apps Script 웹앱)로 전송 */
+function sendToSheet(payload) {
+  var url = window.GSHEET_ENDPOINT;
+  if (!url || url.indexOf('http') !== 0) return; // URL 미설정 시 조용히 통과
+  try {
+    fetch(url, {
+      method: 'POST',
+      mode: 'no-cors', // Apps Script CORS 제약 회피 (전송만, 응답은 읽지 않음)
+      headers: { 'Content-Type': 'text/plain;charset=utf-8' },
+      body: JSON.stringify(payload)
+    });
+  } catch (err) { /* 네트워크 오류는 사용자 경험을 막지 않도록 무시 */ }
+}
+
+/* ============================================================
+   Supabase (자체 데이터베이스) 연동 설정
+   ------------------------------------------------------------
+   구글에 의존하지 않는, 사장님 소유의 PostgreSQL DB.
+   supabase-setup.md 의 안내대로 프로젝트를 만든 뒤
+   아래 두 값을 채워 넣으세요. (비워두면 DB 전송은 생략됩니다.)
+     · SUPABASE_URL      → 프로젝트 URL (예: https://xxxx.supabase.co)
+     · SUPABASE_ANON_KEY → 공개(anon) API 키
+   ============================================================ */
+window.SUPABASE_URL = 'https://qpxomysgmnmdqvzzpqex.supabase.co';
+window.SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InFweG9teXNnbW5tZHF2enpwcWV4Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODE4NTIxMzEsImV4cCI6MjA5NzQyODEzMX0.rxb8m18D7FbpNpAUMp5BQt9yR9YgXVy0S_qDBzparWY';
+
+/* 폼 데이터를 Supabase 테이블(submissions)에 입력 */
+function sendToDatabase(payload) {
+  var base = window.SUPABASE_URL, key = window.SUPABASE_ANON_KEY;
+  if (!base || !key || base.indexOf('http') !== 0) return; // 미설정 시 통과
+  var row = {
+    form_type: payload.formType || '',
+    name: payload.name || null,
+    phone: payload.phone || null,
+    program: payload.program || null,
+    birth: payload.birth || null,
+    signdate: payload.signdate || null,
+    company: payload.company || null,
+    partner_type: payload.type || null,
+    memo: payload.memo || null
+  };
+  try {
+    fetch(base.replace(/\/+$/, '') + '/rest/v1/submissions', {
+      method: 'POST',
+      headers: {
+        'apikey': key,
+        'Authorization': 'Bearer ' + key,
+        'Content-Type': 'application/json',
+        'Prefer': 'return=minimal'
+      },
+      body: JSON.stringify(row)
+    });
+  } catch (err) { /* 사용자 경험을 막지 않도록 오류 무시 */ }
+}
+
+/* <form> 의 name 필드를 평범한 객체로 직렬화 (라디오/셀렉트 포함) */
+function serializeForm(form) {
+  var obj = {};
+  new FormData(form).forEach(function (v, k) { obj[k] = v; });
+  return obj;
+}
+
 (function () {
   'use strict';
 
@@ -184,6 +257,10 @@
   if (form) {
     form.addEventListener('submit', function (e) {
       e.preventDefault();
+      var data = serializeForm(form);
+      data.formType = 'B2B제휴문의';
+      sendToSheet(data);
+      sendToDatabase(data);
       var ok = document.getElementById('formSuccess');
       ok.classList.add('show');
       form.querySelectorAll('input,textarea,select,button').forEach(function (el) {
@@ -285,6 +362,10 @@
   if (form) {
     form.addEventListener('submit', function (e) {
       e.preventDefault();
+      var data = serializeForm(form);
+      data.formType = '이용신청서';
+      sendToSheet(data);
+      sendToDatabase(data);
       var ok = document.getElementById('applySuccess');
       if (ok) ok.classList.add('show');
       setTimeout(function () { form.reset(); }, 120);
