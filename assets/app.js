@@ -264,3 +264,30 @@
     else if (e.key === 'ArrowRight') openAt(idx + 1);
   });
 })();
+
+
+/* ============================================================
+   Application (이용 신청서) modal
+   ============================================================ */
+(function () {
+  'use strict';
+  var modal = document.getElementById('applyModal');
+  if (!modal) return;
+  var openers = document.querySelectorAll('[data-open-apply]');
+  var closeBtn = document.getElementById('applyClose');
+  function open(e) { if (e) e.preventDefault(); modal.classList.add('open'); modal.setAttribute('aria-hidden', 'false'); document.body.style.overflow = 'hidden'; }
+  function close() { modal.classList.remove('open'); modal.setAttribute('aria-hidden', 'true'); document.body.style.overflow = ''; }
+  openers.forEach(function (b) { b.addEventListener('click', open); });
+  if (closeBtn) closeBtn.addEventListener('click', close);
+  modal.addEventListener('click', function (e) { if (e.target === modal) close(); });
+  document.addEventListener('keydown', function (e) { if (e.key === 'Escape' && modal.classList.contains('open')) close(); });
+  var form = document.getElementById('applyForm');
+  if (form) {
+    form.addEventListener('submit', function (e) {
+      e.preventDefault();
+      var ok = document.getElementById('applySuccess');
+      if (ok) ok.classList.add('show');
+      setTimeout(function () { form.reset(); }, 120);
+    });
+  }
+})();

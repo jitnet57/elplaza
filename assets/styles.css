@@ -660,3 +660,46 @@ h2.display {
   .lb-nav { width: 42px; height: 42px; font-size: 26px; }
   .lb-prev { left: 10px; } .lb-next { right: 10px; }
 }
+
+
+/* ============== APPLICATION FAB + MODAL ============== */
+.fab .apply { background: var(--gold); color: #FBF8F0; }
+.apply-modal {
+  position: fixed; inset: 0; z-index: 120;
+  display: none; align-items: center; justify-content: center; padding: 20px;
+  background: rgba(18,26,21,.84); -webkit-backdrop-filter: blur(4px); backdrop-filter: blur(4px);
+}
+.apply-modal.open { display: flex; }
+.apply-dialog {
+  position: relative; width: 100%; max-width: 560px; max-height: 90vh; overflow-y: auto;
+  background: linear-gradient(165deg, var(--forest), var(--forest-deep));
+  color: #F3EEE2; border-radius: 18px; padding: clamp(24px, 4vw, 40px);
+  box-shadow: var(--shadow-lg);
+}
+.apply-eyebrow { font-family: var(--eng); font-style: italic; font-size: 14px; color: var(--gold-soft); }
+.apply-dialog h3 { color: #FDFBF5; font-size: 25px; font-weight: 600; margin: 6px 0 8px; }
+.apply-dialog .sub { color: rgba(243,238,226,.78); font-size: 14px; line-height: 1.6; margin-bottom: 24px; }
+.apply-close {
+  position: absolute; top: 16px; right: 16px; width: 38px; height: 38px; border-radius: 50%;
+  background: rgba(255,255,255,.12); border: 1px solid rgba(255,255,255,.25);
+  color: #fff; font-size: 24px; line-height: 1; cursor: pointer; transition: background .2s;
+}
+.apply-close:hover { background: rgba(255,255,255,.26); }
+.apply-block { margin-bottom: 20px; }
+.apply-blk-label { display: block; font-size: 11.5px; font-weight: 700; letter-spacing: .1em; text-transform: uppercase; color: var(--gold-soft); margin-bottom: 11px; }
+.apply-radios { display: flex; flex-direction: column; gap: 10px; }
+.apply-radio {
+  display: flex; align-items: center; gap: 11px; font-size: 14.5px; cursor: pointer;
+  padding: 13px 15px; border: 1px solid rgba(255,255,255,.18); border-radius: 10px;
+  background: rgba(255,255,255,.04); transition: border-color .2s, background .2s;
+}
+.apply-radio:hover { border-color: var(--gold-soft); background: rgba(255,255,255,.07); }
+.apply-radio input { accent-color: var(--gold-soft); width: 17px; height: 17px; flex: none; }
+.apply-fixed { display: grid; gap: 9px; background: rgba(255,255,255,.05); border: 1px solid rgba(255,255,255,.14); border-radius: 10px; padding: 14px 16px; }
+.apply-fixed > div { display: flex; justify-content: space-between; font-size: 14px; }
+.apply-fixed span { color: rgba(243,238,226,.6); }
+.apply-fixed b { color: #FBF8F0; font-weight: 600; }
+.apply-actions { margin-top: 6px; }
+.apply-actions .btn { width: 100%; justify-content: center; }
+.apply-note { font-size: 12px; color: rgba(243,238,226,.55); line-height: 1.55; margin-top: 14px; }
+@media (max-width: 640px) { .apply-dialog { padding: 24px 18px; } }
