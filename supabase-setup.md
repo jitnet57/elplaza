@@ -72,8 +72,46 @@ Supabase 대시보드 좌측 **Table Editor → submissions** 에서
 - 필터/정렬로 `이용신청서` / `B2B제휴문의` 구분해 보기
 - 우측 상단 **Export → CSV** 로 엑셀 다운로드(로컬 백업) 가능
 
+---
+
+# 관리자 화면(admin.html)에서 신청 내역 보기
+
+`admin.html` 은 **로그인한 관리자만** 신청 내역을 표로 보고 CSV로 내려받는 페이지입니다.
+주소: `https://elplaza.vercel.app/admin.html`
+작동시키려면 아래 3가지를 1회 설정하세요.
+
+## A. 읽기 권한 정책 추가 (SQL 1회)
+SQL Editor → New query 에 붙여넣고 Run:
+
+```sql
+-- 로그인한 관리자는 신청 내역을 조회(SELECT)할 수 있다
+create policy "authenticated can read" on public.submissions
+  for select to authenticated using (true);
+```
+
+## B. 공개 회원가입 끄기 (보안 — 중요)
+이걸 꺼야 아무나 계정을 만들어 데이터를 보는 것을 막습니다.
+**Authentication → Sign In / Providers → Email** 에서
+**"Allow new users to sign up"(신규 가입 허용)** 토글을 **끔(off)** 으로.
+
+## C. 관리자 계정 만들기
+**Authentication → Users → Add user → Create new user** 에서
+- Email: 관리자가 로그인에 쓸 이메일 (예: admin@elplaza.com)
+- Password: 비밀번호 설정
+- (Auto Confirm User 체크)
+
+→ 이제 `admin.html` 에 그 이메일/비밀번호로 로그인하면 신청 내역이 보입니다.
+
+## 관리자 화면 기능
+- 전체 / 이용신청서 / B2B 탭으로 구분해서 보기
+- **CSV 내보내기** 버튼 → 현재 보는 목록을 PC에 파일로 저장(로컬 백업)
+- 새로고침 / 로그아웃
+
+---
+
 ## 참고 / 보안
 - anon 키는 웹에 노출되지만, RLS가 입력만 허용하므로 데이터 유출 위험은 없습니다.
+  (조회는 로그인한 관리자만 — 위 A·B·C 설정 기준)
 - 누군가 장난 입력을 대량으로 넣는 게 걱정되면, 나중에 reCAPTCHA나
   간단한 honeypot 필드를 추가할 수 있습니다 (현재 트래픽 규모면 불필요).
 - 구글 시트 연동(`google-apps-script.gs`)과 **동시 사용도 가능**합니다.

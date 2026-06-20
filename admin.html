@@ -1,0 +1,252 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<meta name="robots" content="noindex, nofollow" />
+<title>EL PLAZA · 신청 내역 관리</title>
+<link href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@300;400;500;600;700&display=swap" rel="stylesheet" />
+<style>
+  :root { --forest:#1f3d2b; --gold:#b89150; --line:#e3e1da; --bg:#f6f5f1; --ink:#222; }
+  * { box-sizing:border-box; }
+  body { margin:0; font-family:'Noto Sans KR',sans-serif; color:var(--ink); background:var(--bg); }
+  header { background:var(--forest); color:#fff; padding:18px 24px; display:flex; align-items:center; justify-content:space-between; flex-wrap:wrap; gap:12px; }
+  header h1 { font-size:18px; margin:0; font-weight:600; letter-spacing:.02em; }
+  header .who { font-size:13px; opacity:.85; }
+  .btn { font-family:inherit; border:none; border-radius:8px; padding:9px 16px; font-size:14px; font-weight:500; cursor:pointer; }
+  .btn--gold { background:var(--gold); color:#fff; }
+  .btn--ghost { background:transparent; color:#fff; border:1px solid rgba(255,255,255,.4); }
+  .btn--line { background:#fff; color:var(--forest); border:1px solid var(--line); }
+  .wrap { max-width:1100px; margin:0 auto; padding:24px; }
+
+  /* 로그인 */
+  .login { max-width:380px; margin:80px auto; background:#fff; border:1px solid var(--line); border-radius:14px; padding:36px 30px; }
+  .login h2 { margin:0 0 6px; font-size:20px; color:var(--forest); }
+  .login p { margin:0 0 22px; font-size:13px; color:#777; }
+  .login label { display:block; font-size:13px; font-weight:500; margin:14px 0 6px; }
+  .login input { width:100%; padding:11px 13px; border:1px solid var(--line); border-radius:8px; font-size:15px; font-family:inherit; }
+  .login .btn--gold { width:100%; margin-top:22px; padding:12px; }
+  .err { color:#c0392b; font-size:13px; margin-top:14px; min-height:18px; }
+
+  /* 툴바 */
+  .toolbar { display:flex; align-items:center; gap:10px; flex-wrap:wrap; margin-bottom:16px; }
+  .tabs { display:flex; gap:6px; }
+  .tab { background:#fff; border:1px solid var(--line); border-radius:999px; padding:7px 15px; font-size:13px; cursor:pointer; color:#555; }
+  .tab.active { background:var(--forest); color:#fff; border-color:var(--forest); }
+  .spacer { flex:1; }
+  .count { font-size:13px; color:#777; }
+
+  /* 표 */
+  .tablewrap { background:#fff; border:1px solid var(--line); border-radius:12px; overflow:auto; }
+  table { width:100%; border-collapse:collapse; font-size:13px; white-space:nowrap; }
+  th, td { padding:11px 13px; text-align:left; border-bottom:1px solid var(--line); }
+  th { background:#faf9f6; font-weight:600; color:#555; position:sticky; top:0; }
+  tr:last-child td { border-bottom:none; }
+  td.memo { white-space:normal; max-width:260px; }
+  .badge { font-size:11px; padding:2px 8px; border-radius:999px; font-weight:600; }
+  .badge.apply { background:#e8f0ea; color:var(--forest); }
+  .badge.b2b { background:#f3ecdc; color:#8a6a23; }
+  .empty { text-align:center; color:#999; padding:50px 0; font-size:14px; }
+  .loading { text-align:center; color:#999; padding:50px 0; }
+</style>
+</head>
+<body>
+
+<!-- 로그인 화면 -->
+<div id="loginView" class="login" style="display:none">
+  <h2>관리자 로그인</h2>
+  <p>신청 내역을 보려면 관리자 계정으로 로그인하세요.</p>
+  <label>이메일</label>
+  <input id="email" type="email" autocomplete="username" placeholder="admin@elplaza.com" />
+  <label>비밀번호</label>
+  <input id="password" type="password" autocomplete="current-password" placeholder="••••••••" />
+  <button class="btn btn--gold" id="loginBtn">로그인</button>
+  <div class="err" id="loginErr"></div>
+</div>
+
+<!-- 데이터 화면 -->
+<div id="dataView" style="display:none">
+  <header>
+    <h1>EL PLAZA · 신청 내역 관리</h1>
+    <div style="display:flex; align-items:center; gap:14px">
+      <span class="who" id="whoami"></span>
+      <button class="btn btn--ghost" id="logoutBtn">로그아웃</button>
+    </div>
+  </header>
+  <div class="wrap">
+    <div class="toolbar">
+      <div class="tabs">
+        <button class="tab active" data-filter="all">전체</button>
+        <button class="tab" data-filter="이용신청서">이용신청서</button>
+        <button class="tab" data-filter="B2B제휴문의">B2B 제휴문의</button>
+      </div>
+      <span class="count" id="count"></span>
+      <span class="spacer"></span>
+      <button class="btn btn--line" id="refreshBtn">새로고침</button>
+      <button class="btn btn--gold" id="csvBtn">CSV 내보내기</button>
+    </div>
+    <div class="tablewrap">
+      <div id="tableHost"><div class="loading">불러오는 중…</div></div>
+    </div>
+  </div>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script>
+  /* === Supabase 연결 (app.js 와 동일한 공개 anon 키) === */
+  var SUPABASE_URL = 'https://qpxomysgmnmdqvzzpqex.supabase.co';
+  var SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InFweG9teXNnbW5tZHF2enpwcWV4Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODE4NTIxMzEsImV4cCI6MjA5NzQyODEzMX0.rxb8m18D7FbpNpAUMp5BQt9yR9YgXVy0S_qDBzparWY';
+  var sb = supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+
+  var loginView = document.getElementById('loginView');
+  var dataView  = document.getElementById('dataView');
+  var allRows = [];
+  var curFilter = 'all';
+
+  /* 열 정의 (필터별) */
+  var COLS = {
+    '이용신청서': [
+      ['created_at','접수시각'], ['program','신청 프로그램'], ['name','성명'],
+      ['phone','연락처'], ['birth','생년월일'], ['signdate','작성일자']
+    ],
+    'B2B제휴문의': [
+      ['created_at','접수시각'], ['company','회사/단체명'], ['name','담당자'],
+      ['phone','연락처'], ['partner_type','파트너유형'], ['memo','문의내용']
+    ],
+    'all': [
+      ['created_at','접수시각'], ['form_type','구분'], ['name','이름'],
+      ['phone','연락처'], ['program','프로그램/회사'], ['memo','비고']
+    ]
+  };
+
+  function fmtTime(iso) {
+    if (!iso) return '';
+    var d = new Date(iso);
+    if (isNaN(d)) return iso;
+    var p = function (n) { return (n < 10 ? '0' : '') + n; };
+    return d.getFullYear() + '-' + p(d.getMonth()+1) + '-' + p(d.getDate()) +
+           ' ' + p(d.getHours()) + ':' + p(d.getMinutes());
+  }
+
+  function cellValue(row, key) {
+    if (key === 'created_at') return fmtTime(row.created_at);
+    if (curFilter === 'all' && key === 'program') return row.program || row.company || '';
+    if (curFilter === 'all' && key === 'memo')    return row.memo || row.partner_type || row.signdate || '';
+    return row[key] == null ? '' : row[key];
+  }
+
+  function visibleRows() {
+    return curFilter === 'all' ? allRows : allRows.filter(function (r) { return r.form_type === curFilter; });
+  }
+
+  function render() {
+    var rows = visibleRows();
+    var cols = COLS[curFilter];
+    document.getElementById('count').textContent = '총 ' + rows.length + '건';
+    if (!rows.length) {
+      document.getElementById('tableHost').innerHTML = '<div class="empty">아직 접수된 신청이 없습니다.</div>';
+      return;
+    }
+    var html = '<table><thead><tr>';
+    cols.forEach(function (c) { html += '<th>' + c[1] + '</th>'; });
+    html += '</tr></thead><tbody>';
+    rows.forEach(function (r) {
+      html += '<tr>';
+      cols.forEach(function (c) {
+        var key = c[0], val = String(cellValue(r, key));
+        var esc = val.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
+        if (key === 'form_type') {
+          var cls = r.form_type === '이용신청서' ? 'apply' : 'b2b';
+          var label = r.form_type === '이용신청서' ? '이용신청' : 'B2B';
+          html += '<td><span class="badge ' + cls + '">' + label + '</span></td>';
+        } else if (key === 'memo') {
+          html += '<td class="memo">' + esc + '</td>';
+        } else {
+          html += '<td>' + esc + '</td>';
+        }
+      });
+      html += '</tr>';
+    });
+    html += '</tbody></table>';
+    document.getElementById('tableHost').innerHTML = html;
+  }
+
+  async function loadData() {
+    document.getElementById('tableHost').innerHTML = '<div class="loading">불러오는 중…</div>';
+    var res = await sb.from('submissions').select('*').order('created_at', { ascending: false });
+    if (res.error) {
+      document.getElementById('tableHost').innerHTML =
+        '<div class="empty">데이터를 불러오지 못했습니다.<br>' + res.error.message +
+        '<br><small>(관리자 읽기 권한(RLS SELECT 정책)이 설정되었는지 확인하세요.)</small></div>';
+      return;
+    }
+    allRows = res.data || [];
+    render();
+  }
+
+  function toCSV() {
+    var rows = visibleRows();
+    var cols = COLS[curFilter];
+    var lines = [cols.map(function (c) { return '"' + c[1] + '"'; }).join(',')];
+    rows.forEach(function (r) {
+      lines.push(cols.map(function (c) {
+        var v = String(cellValue(r, c[0])).replace(/"/g, '""');
+        return '"' + v + '"';
+      }).join(','));
+    });
+    var label = curFilter === 'all' ? '전체' : curFilter;
+    var blob = new Blob(['﻿' + lines.join('\r\n')], { type: 'text/csv;charset=utf-8' });
+    var url = URL.createObjectURL(blob);
+    var a = document.createElement('a');
+    a.href = url;
+    a.download = 'elplaza_' + label + '.csv';
+    document.body.appendChild(a); a.click();
+    document.body.removeChild(a); URL.revokeObjectURL(url);
+  }
+
+  /* === 화면 전환 === */
+  function showLogin() { loginView.style.display = 'block'; dataView.style.display = 'none'; }
+  function showData(email) {
+    loginView.style.display = 'none';
+    dataView.style.display = 'block';
+    document.getElementById('whoami').textContent = email || '';
+    loadData();
+  }
+
+  /* === 이벤트 === */
+  document.getElementById('loginBtn').addEventListener('click', async function () {
+    var email = document.getElementById('email').value.trim();
+    var password = document.getElementById('password').value;
+    var errEl = document.getElementById('loginErr');
+    errEl.textContent = '';
+    if (!email || !password) { errEl.textContent = '이메일과 비밀번호를 입력하세요.'; return; }
+    var res = await sb.auth.signInWithPassword({ email: email, password: password });
+    if (res.error) { errEl.textContent = '로그인 실패: ' + res.error.message; return; }
+    showData(res.data.user.email);
+  });
+  document.getElementById('password').addEventListener('keydown', function (e) {
+    if (e.key === 'Enter') document.getElementById('loginBtn').click();
+  });
+  document.getElementById('logoutBtn').addEventListener('click', async function () {
+    await sb.auth.signOut(); showLogin();
+  });
+  document.getElementById('refreshBtn').addEventListener('click', loadData);
+  document.getElementById('csvBtn').addEventListener('click', toCSV);
+  Array.prototype.forEach.call(document.querySelectorAll('.tab'), function (t) {
+    t.addEventListener('click', function () {
+      document.querySelectorAll('.tab').forEach(function (x) { x.classList.remove('active'); });
+      t.classList.add('active');
+      curFilter = t.getAttribute('data-filter');
+      render();
+    });
+  });
+
+  /* === 시작 시 기존 세션 확인 === */
+  (async function () {
+    var s = await sb.auth.getSession();
+    if (s.data.session) showData(s.data.session.user.email);
+    else showLogin();
+  })();
+</script>
+</body>
+</html>
