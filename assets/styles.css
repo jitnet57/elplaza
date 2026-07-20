@@ -437,6 +437,8 @@ h2.display {
 .price-card li { font-size: 14px; display: flex; gap: 11px; align-items: flex-start; line-height: 1.55; }
 .price-card li::before { content: "—"; color: var(--clay); flex: none; }
 .price-card.featured li::before { color: var(--gold-soft); }
+/* 가격 그리드 하단 유의사항 */
+.price-note { margin-top: 18px; font-size: 13px; line-height: 1.7; color: var(--ink-mute); }
 /* 불포함(별도 옵션) 항목 — 표기는 하되 포함 항목과 시각적으로 구분 */
 .price-card li.li-out { color: var(--ink-mute); }
 .price-card li.li-out::before { content: "+"; color: var(--ink-mute); }
