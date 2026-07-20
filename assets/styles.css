@@ -494,6 +494,15 @@ h2.display {
 .b2b { background: var(--bg-2); position: relative; }
 .b2b::before { content: ""; position: absolute; inset: 0; background-image: repeating-linear-gradient(-45deg, rgba(51,80,63,.02) 0, rgba(51,80,63,.02) 1px, transparent 1px, transparent 14px); pointer-events: none; }
 .b2b-head { display: grid; grid-template-columns: 1.1fr .9fr; gap: 40px; align-items: end; margin-bottom: 48px; }
+/* 보람라이프 업무제휴 배너 */
+.mou { background: linear-gradient(170deg, var(--forest), var(--forest-deep)); color: #F3EEE2; border: 1px solid var(--forest-deep); border-radius: 13px; padding: 34px 36px; margin-bottom: 22px; }
+.mou-tag { font-size: 11px; font-weight: 700; letter-spacing: .14em; text-transform: uppercase; color: var(--gold); }
+.mou h3 { font-size: 24px; font-weight: 600; color: #FDFBF5; margin: 10px 0 12px; }
+.mou p { font-size: 14.5px; line-height: 1.75; color: rgba(243, 238, 226, .82); max-width: 82ch; }
+.mou p b { color: #FDFBF5; font-weight: 600; }
+.mou-links { display: flex; flex-wrap: wrap; gap: 10px 22px; margin-top: 18px; }
+.mou-links a { font-size: 13.5px; font-weight: 600; color: var(--gold-soft); border-bottom: 1px solid rgba(205, 168, 107, .4); padding-bottom: 2px; transition: color .2s, border-color .2s; }
+.mou-links a:hover { color: #FDFBF5; border-color: #FDFBF5; }
 .b2b-benefits { display: grid; grid-template-columns: repeat(3, 1fr); gap: 18px; margin-bottom: 24px; }
 .b2b-card { background: var(--card); border: 1px solid var(--line); border-radius: 13px; padding: 30px; position: relative; transition: transform .3s, box-shadow .3s; }
 .b2b-card:hover { transform: translateY(-4px); box-shadow: var(--shadow); }
@@ -579,6 +588,7 @@ h2.display {
   .infra-grid, .class-grid, .opt-grid, .b2b-benefits, .b2b-flow { grid-template-columns: repeat(2, 1fr); }
   .diff-grid, .feature-grid, .price-grid, .inc-list, .form-grid, .contact-card-row { grid-template-columns: 1fr; }
   .price-card--wide ul { grid-template-columns: 1fr; }
+  .mou { padding: 26px 22px; }
   .tour-grid { grid-template-columns: 1fr 1fr; grid-auto-rows: 180px; }
   .tour.span-3, .tour.span-2 { grid-column: span 1; }
   .tour.tall { grid-row: span 1; }
