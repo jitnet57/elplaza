@@ -437,6 +437,15 @@ h2.display {
 .price-card li { font-size: 14px; display: flex; gap: 11px; align-items: flex-start; line-height: 1.55; }
 .price-card li::before { content: "—"; color: var(--clay); flex: none; }
 .price-card.featured li::before { color: var(--gold-soft); }
+/* 불포함(별도 옵션) 항목 — 표기는 하되 포함 항목과 시각적으로 구분 */
+.price-card li.li-out { color: var(--ink-mute); }
+.price-card li.li-out::before { content: "+"; color: var(--ink-mute); }
+.price-card li.li-out b { font-weight: 600; letter-spacing: -.01em; }
+.price-card.featured li.li-out,
+.price-card.featured li.li-out::before { color: rgba(243, 238, 226, .58); }
+/* full-width card (span both columns) — list flows into 2 columns */
+.price-card--wide { grid-column: 1 / -1; }
+.price-card--wide ul { display: grid; grid-template-columns: 1fr 1fr; column-gap: 28px; }
 
 /* included / excluded toggle */
 .inc-tabs { display: inline-flex; background: var(--bg-2); border: 1px solid var(--line); border-radius: 40px; padding: 4px; margin-bottom: 26px; }
@@ -567,6 +576,7 @@ h2.display {
   .split--rev .split-media { order: 0; }
   .infra-grid, .class-grid, .opt-grid, .b2b-benefits, .b2b-flow { grid-template-columns: repeat(2, 1fr); }
   .diff-grid, .feature-grid, .price-grid, .inc-list, .form-grid, .contact-card-row { grid-template-columns: 1fr; }
+  .price-card--wide ul { grid-template-columns: 1fr; }
   .tour-grid { grid-template-columns: 1fr 1fr; grid-auto-rows: 180px; }
   .tour.span-3, .tour.span-2 { grid-column: span 1; }
   .tour.tall { grid-row: span 1; }

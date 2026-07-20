@@ -127,7 +127,7 @@ function serializeForm(form) {
     });
   }
 
-  /* ---------- 31-day schedule (Mon-start) ---------- */
+  /* ---------- 30-day schedule (Mon-start) ---------- */
   // acts: array of {c: catKey, t: text}; tour: big tour label; rest: true
   var DAYS = [
     { acts: [{c:'yoga',t:'09:00 요가'},{c:'eng',t:'10:30 영어'},{c:'spa',t:'오후 자유·스파'}] },
@@ -168,7 +168,7 @@ function serializeForm(form) {
 
   var grid = document.getElementById('calGrid');
   if (grid) {
-    // Day 1 is Monday → no leading empties needed (Mon-start grid). 31 days.
+    // Day 1 is Monday → no leading empties needed (Mon-start grid). 30 days.
     DAYS.forEach(function (d, i) {
       var n = i + 1;
       var dow = i % 7; // 0=Mon ... 5=Sat,6=Sun
@@ -192,7 +192,7 @@ function serializeForm(form) {
       cell.innerHTML = html;
       grid.appendChild(cell);
     });
-    // trailing empties to complete final week row (31 days → 3 trailing for 7-col)
+    // trailing empties to complete final week row (30 days → 5 trailing for 7-col)
     var trailing = (7 - (DAYS.length % 7)) % 7;
     for (var t = 0; t < trailing; t++) {
       var e = document.createElement('div');
@@ -203,7 +203,7 @@ function serializeForm(form) {
 
   /* ---------- included / excluded ---------- */
   var INCLUDED = [
-    ['숙박', '콘도텔 30박 · 풀옵션 룸 렌트'],
+    ['숙박', '콘도텔 29박 · 풀옵션 룸 렌트'],
     ['식사', '30일 조식 기본 포함 (아메리칸 브런치)'],
     ['골프', '필드 골프 1회 라운딩 기본 포함'],
     ['액티비티', '호핑투어 1회 (중식 포함) · 시티투어 1회'],
@@ -215,6 +215,7 @@ function serializeForm(form) {
     ['생활', '룸 청소 및 빨래 서비스 주 3회 제공']
   ];
   var EXCLUDED = [
+    ['보홀 투어', '보홀 2박3일 (별도 옵션 · 추가 견적)'],
     ['항공', '왕복 항공권'],
     ['비자', '관광비자 연장 비용'],
     ['추가 레저', '골프·스킨스쿠버 추가 이용료'],
